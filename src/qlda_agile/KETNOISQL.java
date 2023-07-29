@@ -1,4 +1,4 @@
-package assignment;
+package qlda_agile;
 
 import java.sql.*;
 
