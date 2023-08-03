@@ -35,7 +35,7 @@ public class XEMDIEMSINHVIEN extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         }
-        conn = KETNOISQL.getConnection("sa", "nguyentuakina", "QLDA_SINHVIEN");
+        conn = KETNOISQL.getConnection("sa", "bachvanchilo", "QLDA_SINHVIEN");
         loadTable();
 //        display(current);
         lblReocrd.setText(layThongTinBanGhi());

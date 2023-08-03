@@ -30,7 +30,7 @@ public class LOGIN extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         }
-        conn = KETNOISQL.getConnection("sa", "nguyentuakina", "QLDA_SINHVIEN");
+        conn = KETNOISQL.getConnection("sa", "bachvanchilo", "QLDA_SINHVIEN");
 
     }
 
@@ -67,11 +67,33 @@ public class LOGIN extends javax.swing.JFrame {
                             setVisible(false);
                         }
                         if (rs.getString("ROLE").equals("sv")) {
-                            String a = JOptionPane.showInputDialog(this, "vui lòng nhập mk mới");
-                            XEMDIEMSINHVIEN xdsv = new XEMDIEMSINHVIEN();
-                            JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
-                            xdsv.setVisible(true);
-                            setVisible(false);
+                            if (pass.equalsIgnoreCase("123456")) {
+                                String passW = JOptionPane.showInputDialog(this, "Nhập mật khẩu mới!");
+                                if (passW == null) {
+                                    return;
+                                } else if (passW.equals("")) {
+                                    JOptionPane.showMessageDialog(this, "Bạn chưa nhập mật khẩu");
+                                    return;
+                                } else {
+                                    if (passW.equalsIgnoreCase("123456")) {
+                                        JOptionPane.showMessageDialog(this, "Bạn nhập mật khẩu bị trùng mới mặc định!");
+                                        return;
+                                    } else {
+                                        JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công");
+                                    }
+                                }
+                                st = conn.createStatement();
+                                String updateSQL = "update USERS set PASSWORD = '" + passW + "'"
+                                        + " where USERNAME = '" + txtUsername.getText() + "'";
+                                st.executeUpdate(updateSQL);
+                                txtUsername.setText("");
+                                txtPassword.setText("");
+                            } else {
+                                XEMDIEMSINHVIEN xdsv = new XEMDIEMSINHVIEN();
+                                JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
+                                xdsv.setVisible(true);
+                                setVisible(false);
+                            }
                         }
                     }
                 }
@@ -213,7 +235,7 @@ public class LOGIN extends javax.swing.JFrame {
         try {
             login();
         } catch (SQLException ex) {
-            Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 

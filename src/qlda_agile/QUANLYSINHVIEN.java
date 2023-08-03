@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -44,7 +45,7 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         }
-        conn = KETNOISQL.getConnection("sa", "nguyentuakina", "QLDA_SINHVIEN");
+        conn = KETNOISQL.getConnection("sa", "bachvanchilo", "QLDA_SINHVIEN");
         initComponents();
         setLocationRelativeTo(null);
         setTitle("Quản lý sinh viên");
@@ -112,7 +113,7 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
         }
     }
 
-    public void btnSave() {
+    public void btnSave() throws SQLException {
         if (checkNull()) {
             return;
         } else if (checkMASV()) {
@@ -124,10 +125,34 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
                 + "('" + txtMasv.getText() + "',N'" + txtHoten.getText() + "',"
                 + "'" + txtEmail.getText() + "','" + txtSodt.getText() + "',"
                 + "N'" + getGioiTinh() + "',N'" + txtDiachi.getText() + "',N'" + imageSave + "')";
+        boolean checkID = true;
+        int id = 0;
+        while (checkID) {
+            Random random = new Random();
+            id = random.nextInt(1000); // Thay số trong ngoặc bằng giới hạn trên của giá trị ID
+            String checkSQL = "select count(*) from GRADE where ID = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkSQL);
+            checkStmt.setInt(1, id);
+            ResultSet rs = checkStmt.executeQuery();
+//                if (list.size() > 5) {
+//                    JOptionPane.showMessageDialog(this, "Max ID");
+//                    checkID = false;
+//                }
+            if (rs.next() && rs.getInt(1) == 0) {
+//                JOptionPane.showMessageDialog(this, rs.getInt(1));
+                checkID = false; // Không trùng, thoát khỏi vòng lặp
+            }
+        }
+        String insertSQL = "insert into GRADE values"
+                + "('" + id + "','" + txtMasv.getText() + "','0','0','0')";
+        String insertUSERSQL = "insert into USERS values"
+                + "('" + txtEmail.getText() + "','123456','sv')";
         try {
             Statement acTionIS = conn.createStatement();
             int soDong = acTionIS.executeUpdate(insertSql);
             if (soDong > 0) {
+                acTionIS.executeUpdate(insertSQL);
+                acTionIS.execute(insertUSERSQL);
                 JOptionPane.showMessageDialog(this, "Đã thêm thành công!");
             }
             loadTable();
@@ -673,7 +698,11 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
     }//GEN-LAST:event_txtHotenActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        btnSave();
+        try {
+            btnSave();
+        } catch (SQLException ex) {
+            Logger.getLogger(QUANLYSINHVIEN.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -695,7 +724,7 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
 
     private void tblSinhVienMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSinhVienMousePressed
         display(tblSinhVien.getSelectedRow());
-        btnDelete.setEnabled(false);
+//        btnDelete.setEnabled(false);
         layThongTinBanGhi();
     }//GEN-LAST:event_tblSinhVienMousePressed
 
@@ -745,7 +774,7 @@ public class QUANLYSINHVIEN extends javax.swing.JFrame {
 
     private void jpnAnhMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jpnAnhMousePressed
         JFileChooser fc = new JFileChooser();//mở file
-        fc.setCurrentDirectory(new File("D:\\"));//set mac dinh
+//        fc.setCurrentDirectory(new File("D:\\"));//set mac dinh
         int result = fc.showOpenDialog(this);//hiển thị hộp thoại
         if (result == fc.APPROVE_OPTION) {
             f1 = fc.getSelectedFile();// lấy file được chọn
